@@ -33,4 +33,57 @@ void Node::print()
             cout << puzzle[i][j] << " ";
         cout << endl;
     }
+    cout << endl;
+}
+
+bool Node::moveBlankUp()
+{
+    if(blanky == 0)
+        return false;
+    else
+    {
+        swap(puzzle[blanky][blankx], puzzle[blanky-1][blankx]);
+        blanky--;
+        return true;
+    }
+    return false;
+}
+
+bool Node::moveBlankDown()
+{
+    if(blanky == puzzle.size()-1)
+        return false;
+    else
+    {
+        swap(puzzle[blanky][blankx], puzzle[blanky+1][blankx]);
+        blanky++;
+        return true;
+    }
+    return false;
+}
+
+bool Node::moveBlankLeft()
+{
+    if(blankx == 0)
+        return false;
+    else
+    {
+        swap(puzzle[blanky][blankx], puzzle[blanky][blankx-1]);
+        blankx--;
+        return true;
+    }
+    return false;
+}
+
+bool Node::moveBlankRight()
+{
+    if(blankx == puzzle[0].size()-1)
+        return false;
+    else
+    {
+        swap(puzzle[blanky][blankx], puzzle[blanky][blankx+1]);
+        blankx++;
+        return true;
+    }
+    return false;
 }

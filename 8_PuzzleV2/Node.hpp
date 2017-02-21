@@ -21,8 +21,14 @@ public:
     Node(int g, int h, vector<vector<int>> puzz);
     void operator=(const Node& n);
     void print();
+    bool moveBlankUp();
+    bool moveBlankDown();
+    bool moveBlankLeft();
+    bool moveBlankRight();
     int gn;
     int hn;
+    int blankx;
+    int blanky;
     vector<vector<int>> puzzle;
     
 };
