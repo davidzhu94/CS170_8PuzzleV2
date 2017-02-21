@@ -7,9 +7,13 @@
 //
 
 #include <iostream>
+#include "Node.hpp"
+
+using namespace std;
 
 int main(int argc, const char * argv[]) {
-    // insert code here...
-    std::cout << "Hello, World!\n";
+    vector<vector<int>> grid = {{1, 2, 3}, {4, 5, 6}, {7, 8, 0}};
+    Node test(1, 1, grid);
+    test.print();
     return 0;
 }
