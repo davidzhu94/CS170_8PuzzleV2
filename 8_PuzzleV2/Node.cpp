@@ -130,7 +130,9 @@ bool Node::hasNotTraversedA(priority_queue<Node, vector<Node>, compareNode> list
     return true;
 }
 
-void Node::uniform(queue<Node> &traversed)
+
+
+void Node::uniform()
 {
     int tempCount = 1;
     int maxCount = 0;
@@ -138,17 +140,20 @@ void Node::uniform(queue<Node> &traversed)
     Node goal;
     goal.puzzle = this->goal;
     Node temp;
+    Node holder;
+    queue<Node> traversed;
     queue<Node> frontier;
     frontier.push(*this);
     while(!frontier.empty())
     {
-        temp = frontier.front();
+        holder = frontier.front();
+        frontier.pop();
         tempCount--;
-        if(temp.sameNode(goal))
+        if(holder.sameNode(goal))
         {
             cout << "Goal! The end state is :" << endl;
-            temp.print();
-            cout << "With a depth of " << temp.gn << endl;
+            holder.print();
+            cout << "With a depth of " << holder.gn << endl;
             cout << "Expanded nodes: " << exploreCount << endl;
             cout << "Max number of nodes in queue: " << maxCount << endl;
             return;
@@ -156,46 +161,280 @@ void Node::uniform(queue<Node> &traversed)
         else
         {
             cout << "Expanding Node with depth of " << temp.gn << endl;
-            temp.print();
+            holder.print();
+            temp = holder;
             temp.gn++;
-            if(hasNotTraversedUniform(traversed, temp))
+            cout << "queue has this many " << frontier.size() << " traveled this many " << traversed.size() << endl;
+            if(temp.moveBlankLeft())
             {
-                cout << "whu " << endl;
-                if(temp.moveBlankLeft())
+                if(hasNotTraversedUniform(traversed, temp))
                 {
                     tempCount++;
                     exploreCount++;
                     frontier.push(temp);
                     traversed.push(temp);
                 }
-                temp.puzzle = frontier.front().puzzle;
-                if(temp.moveBlankRight())
+            }
+            temp.puzzle = holder.puzzle;
+            temp.blankx = holder.blankx;
+            temp.blanky = holder.blanky;
+            if(temp.moveBlankRight())
+            {
+                if(hasNotTraversedUniform(traversed, temp))
                 {
                     tempCount++;
                     exploreCount++;
                     frontier.push(temp);
                     traversed.push(temp);
                 }
-                temp.puzzle = frontier.front().puzzle;
-                if(temp.moveBlankUp())
+            }
+            temp.puzzle = holder.puzzle;
+            temp.blankx = holder.blankx;
+            temp.blanky = holder.blanky;
+            if(temp.moveBlankUp())
+            {
+                if(hasNotTraversedUniform(traversed, temp))
                 {
                     tempCount++;
                     exploreCount++;
                     frontier.push(temp);
                     traversed.push(temp);
                 }
-                temp.puzzle = frontier.front().puzzle;
-                if(temp.moveBlankDown())
+            }
+            temp.puzzle = holder.puzzle;
+            temp.blankx = holder.blankx;
+            temp.blanky = holder.blanky;
+            if(temp.moveBlankDown())
+            {
+                if(hasNotTraversedUniform(traversed, temp))
                 {
                     tempCount++;
                     exploreCount++;
                     frontier.push(temp);
                     traversed.push(temp);
                 }
-                if(tempCount > maxCount)
-                    maxCount = tempCount;
+            }
+            if(tempCount > maxCount)
+                maxCount = tempCount;
+        }
+    }
+}
+
+
+int misplaced(Node checkMe)
+{
+    int count = 0;
+    for(int i = 0; i < checkMe.goal.size(); i++)
+    {
+        for(int j = 0; j < checkMe.goal[i].size(); j++)
+        {
+            if(checkMe.puzzle[i][j] != checkMe.goal[i][j])
+                count++;
+        }
+    }
+    return count;
+}
+
+int manhattan(Node checkMe)
+{
+    int count = 0;
+    int temp = 0;
+    for(int i = 0; i < checkMe.puzzle.size(); i++)
+    {
+        for(int j = 0; j < checkMe.puzzle[i].size(); j++)
+        {
+            if(checkMe.puzzle[i][j] != checkMe.goal[i][j])
+            {
+                temp = abs(i-(abs(checkMe.puzzle[i][j]-1)/3)) + abs(j-(abs(checkMe.puzzle[i][j])-1)%3);
+                count += temp;
             }
         }
+    }
+    return count;
+}
+
+
+void Node::aStarMis()
+{
+    int tempCount = 1;
+    int maxCount = 0;
+    int exploreCount = 0;
+    Node goal;
+    goal.puzzle = this->goal;
+    Node temp;
+    Node holder;
+    priority_queue<Node, vector<Node>, compareNode> traversed;
+    priority_queue<Node, vector<Node>, compareNode> frontier;
+    frontier.push(*this);
+    traversed.push(*this);
+    while(!frontier.empty())
+    {
+        holder = frontier.top();
+        tempCount--;
         frontier.pop();
+        if(holder.sameNode(goal))
+        {
+            cout << "Goal! The end state is :" << endl;
+            holder.print();
+            cout << "With a depth of " << holder.gn << " and heuristic value of " << holder.hn << endl;
+            cout << "Expanded nodes: " << exploreCount << endl;
+            cout << "Max number of nodes in queue: " << maxCount << endl;
+            return;
+        }
+        else
+        {
+            cout << "Expanding Node with depth of " << holder.gn << " and heuristic value of " << holder.hn << endl;
+            holder.print();
+            temp = holder;
+            temp.gn++;
+            if(temp.moveBlankLeft())
+            {
+                if(hasNotTraversedA(traversed, temp))
+                {
+                    temp.hn = ::misplaced(temp);
+                    tempCount++;
+                    exploreCount++;
+                    frontier.push(temp);
+                    traversed.push(temp);
+                }
+            }
+            temp.puzzle = holder.puzzle;
+            temp.blankx = holder.blankx;
+            temp.blanky = holder.blanky;
+            if(temp.moveBlankRight())
+            {
+                if(hasNotTraversedA(traversed, temp))
+                {
+                    temp.hn = ::misplaced(temp);
+                    tempCount++;
+                    exploreCount++;
+                    frontier.push(temp);
+                    traversed.push(temp);
+                }
+            }
+            temp.puzzle = holder.puzzle;
+            temp.blankx = holder.blankx;
+            temp.blanky = holder.blanky;
+            if(temp.moveBlankUp())
+            {
+                if(hasNotTraversedA(traversed, temp))
+                {
+                    temp.hn = ::misplaced(temp);
+                    tempCount++;
+                    exploreCount++;
+                    frontier.push(temp);
+                    traversed.push(temp);
+                }
+            }
+            temp.puzzle = holder.puzzle;
+            temp.blankx = holder.blankx;
+            temp.blanky = holder.blanky;
+            if(temp.moveBlankDown())
+            {
+                if(hasNotTraversedA(traversed, temp))
+                {
+                    temp.hn = ::misplaced(temp);
+                    tempCount++;
+                    exploreCount++;
+                    frontier.push(temp);
+                    traversed.push(temp);
+                }
+            }
+            if(tempCount > maxCount)
+                maxCount = tempCount;
+        }
+    }
+}
+
+
+void Node::aStarMan()
+{
+    int tempCount = 1;
+    int maxCount = 0;
+    int exploreCount = 0;
+    Node goal;
+    goal.puzzle = this->goal;
+    Node temp;
+    Node holder;
+    priority_queue<Node, vector<Node>, compareNode> traversed;
+    priority_queue<Node, vector<Node>, compareNode> frontier;
+    frontier.push(*this);
+    traversed.push(*this);
+    while(!frontier.empty())
+    {
+        holder = frontier.top();
+        tempCount--;
+        frontier.pop();
+        if(holder.sameNode(goal))
+        {
+            cout << "Goal! The end state is :" << endl;
+            holder.print();
+            cout << "With a depth of " << holder.gn << " and heuristic value of " << holder.hn << endl;
+            cout << "Expanded nodes: " << exploreCount << endl;
+            cout << "Max number of nodes in queue: " << maxCount << endl;
+            return;
+        }
+        else
+        {
+            cout << "Expanding Node with depth of " << holder.gn << " and heuristic value of " << holder.hn << endl;
+            holder.print();
+            temp = holder;
+            temp.gn++;
+            if(temp.moveBlankLeft())
+            {
+                if(hasNotTraversedA(traversed, temp))
+                {
+                    temp.hn = ::manhattan(temp);
+                    tempCount++;
+                    exploreCount++;
+                    frontier.push(temp);
+                    traversed.push(temp);
+                }
+            }
+            temp.puzzle = holder.puzzle;
+            temp.blankx = holder.blankx;
+            temp.blanky = holder.blanky;
+            if(temp.moveBlankRight())
+            {
+                if(hasNotTraversedA(traversed, temp))
+                {
+                    temp.hn = ::manhattan(temp);
+                    tempCount++;
+                    exploreCount++;
+                    frontier.push(temp);
+                    traversed.push(temp);
+                }
+            }
+            temp.puzzle = holder.puzzle;
+            temp.blankx = holder.blankx;
+            temp.blanky = holder.blanky;
+            if(temp.moveBlankUp())
+            {
+                if(hasNotTraversedA(traversed, temp))
+                {
+                    temp.hn = ::manhattan(temp);
+                    tempCount++;
+                    exploreCount++;
+                    frontier.push(temp);
+                    traversed.push(temp);
+                }
+            }
+            temp.puzzle = holder.puzzle;
+            temp.blankx = holder.blankx;
+            temp.blanky = holder.blanky;
+            if(temp.moveBlankDown())
+            {
+                if(hasNotTraversedA(traversed, temp))
+                {
+                    temp.hn = ::manhattan(temp);
+                    tempCount++;
+                    exploreCount++;
+                    frontier.push(temp);
+                    traversed.push(temp);
+                }
+            }
+            if(tempCount > maxCount)
+                maxCount = tempCount;
+        }
     }
 }

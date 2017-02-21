@@ -31,7 +31,14 @@ public:
     bool hasNotTraversedUniform(queue<Node> list, Node checkMe);
     bool hasNotTraversedA(priority_queue<Node, vector<Node>, compareNode> list, Node checkMe);
     
-    void uniform(queue<Node> &traversed);
+    void uniform();
+    
+    int misplaced();
+    int manhattan();
+    int getValue(int selector);
+    
+    void aStarMis();
+    void aStarMan();
     
     int gn;
     int hn;
