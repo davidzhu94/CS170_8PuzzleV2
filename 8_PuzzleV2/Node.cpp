@@ -25,7 +25,7 @@ void Node::operator=(const Node& n)
         puzzle[i] = n.puzzle[i];
 }
 
-void Node::print()
+void Node::print() const
 {
     for(int i = 0; i < puzzle.size(); i++)
     {
@@ -86,4 +86,35 @@ bool Node::moveBlankRight()
         return true;
     }
     return false;
+}
+
+bool Node::sameNode(Node check) const
+{
+    for(int i = 0; i < puzzle.size(); i++)
+    {
+        if(puzzle[i] != check.puzzle[i])
+            return false;
+    }
+    return true;
+}
+
+bool Node::hasNotTraversedUniform(queue<Node> list, Node checkMe)
+{
+    while(!list.empty())
+    {
+        if(list.front().sameNode(checkMe))
+            return false;
+        list.pop();
+    }
+    return true;
+}
+bool hasNotTraversedA(priority_queue<Node, vector<Node>, compareNode> list, Node checkMe)
+{
+    while(!list.empty())
+    {
+        if(list.top().sameNode(checkMe))
+            return false;
+        list.pop();
+    }
+    return true;
 }

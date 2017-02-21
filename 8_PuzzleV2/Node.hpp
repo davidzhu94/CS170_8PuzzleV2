@@ -14,23 +14,26 @@
 #include <queue>
 
 using namespace std;
+struct compareNode;
 
 class Node
 {
 public:
     Node(int g, int h, vector<vector<int>> puzz);
     void operator=(const Node& n);
-    void print();
+    void print() const;
     bool moveBlankUp();
     bool moveBlankDown();
     bool moveBlankLeft();
     bool moveBlankRight();
+    bool sameNode(Node check) const;
+    bool hasNotTraversedUniform(queue<Node> list, Node checkMe);
+    bool hasNotTraversedA(priority_queue<Node, vector<Node>, compareNode> list, Node checkMe);
     int gn;
     int hn;
     int blankx;
     int blanky;
     vector<vector<int>> puzzle;
-    
 };
 
 
