@@ -19,7 +19,8 @@ struct compareNode;
 class Node
 {
 public:
-    Node(int g, int h, vector<vector<int>> puzz);
+    Node();
+    Node(int g, int h, vector<vector<int>> puzz, vector<vector<int>> goalState);
     void operator=(const Node& n);
     void print() const;
     bool moveBlankUp();
@@ -29,11 +30,15 @@ public:
     bool sameNode(Node check) const;
     bool hasNotTraversedUniform(queue<Node> list, Node checkMe);
     bool hasNotTraversedA(priority_queue<Node, vector<Node>, compareNode> list, Node checkMe);
+    
+    void uniform(queue<Node> &traversed);
+    
     int gn;
     int hn;
     int blankx;
     int blanky;
     vector<vector<int>> puzzle;
+    vector<vector<int>> goal;
 };
 
 

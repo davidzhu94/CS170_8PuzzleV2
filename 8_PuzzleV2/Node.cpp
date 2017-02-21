@@ -10,11 +10,20 @@
 #include <iostream>
 using namespace std;
 
-Node::Node(int g, int h, vector<vector<int>> puzz)
+Node::Node()
+{
+    gn = 0;
+    hn = 0;
+    puzzle = {{0}, {0}, {0}};
+    goal = {{1, 2, 3}, {4, 5, 6}, {7, 8, 0}};
+}
+
+Node::Node(int g, int h, vector<vector<int>> puzz, vector<vector<int>> goalState)
 {
     gn = g;
     hn = h;
     puzzle = puzz;
+    goal = goalState;
 }
 
 void Node::operator=(const Node& n)
@@ -23,6 +32,8 @@ void Node::operator=(const Node& n)
     hn = n.hn;
     for(int i = 0; i < puzzle.size(); i++)
         puzzle[i] = n.puzzle[i];
+    blankx = n.blankx;
+    blanky = n.blanky;
 }
 
 void Node::print() const
@@ -108,7 +119,7 @@ bool Node::hasNotTraversedUniform(queue<Node> list, Node checkMe)
     }
     return true;
 }
-bool hasNotTraversedA(priority_queue<Node, vector<Node>, compareNode> list, Node checkMe)
+bool Node::hasNotTraversedA(priority_queue<Node, vector<Node>, compareNode> list, Node checkMe)
 {
     while(!list.empty())
     {
@@ -117,4 +128,74 @@ bool hasNotTraversedA(priority_queue<Node, vector<Node>, compareNode> list, Node
         list.pop();
     }
     return true;
+}
+
+void Node::uniform(queue<Node> &traversed)
+{
+    int tempCount = 1;
+    int maxCount = 0;
+    int exploreCount = 0;
+    Node goal;
+    goal.puzzle = this->goal;
+    Node temp;
+    queue<Node> frontier;
+    frontier.push(*this);
+    while(!frontier.empty())
+    {
+        temp = frontier.front();
+        tempCount--;
+        if(temp.sameNode(goal))
+        {
+            cout << "Goal! The end state is :" << endl;
+            temp.print();
+            cout << "With a depth of " << temp.gn << endl;
+            cout << "Expanded nodes: " << exploreCount << endl;
+            cout << "Max number of nodes in queue: " << maxCount << endl;
+            return;
+        }
+        else
+        {
+            cout << "Expanding Node with depth of " << temp.gn << endl;
+            temp.print();
+            temp.gn++;
+            if(hasNotTraversedUniform(traversed, temp))
+            {
+                cout << "whu " << endl;
+                if(temp.moveBlankLeft())
+                {
+                    tempCount++;
+                    exploreCount++;
+                    frontier.push(temp);
+                    traversed.push(temp);
+                }
+                temp.puzzle = frontier.front().puzzle;
+                if(temp.moveBlankRight())
+                {
+                    tempCount++;
+                    exploreCount++;
+                    frontier.push(temp);
+                    traversed.push(temp);
+                }
+                temp.puzzle = frontier.front().puzzle;
+                if(temp.moveBlankUp())
+                {
+                    tempCount++;
+                    exploreCount++;
+                    frontier.push(temp);
+                    traversed.push(temp);
+                }
+                temp.puzzle = frontier.front().puzzle;
+                if(temp.moveBlankDown())
+                {
+                    tempCount++;
+                    exploreCount++;
+                    frontier.push(temp);
+                    traversed.push(temp);
+                }
+                if(tempCount > maxCount)
+                    maxCount = tempCount;
+            }
+        }
+        frontier.pop();
+    }
 }
